@@ -10,26 +10,25 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Handle specific exceptions
+    // Handle member not found
     @ExceptionHandler(MemberNotFoundException.class)
-    public ResponseEntity<Object> handleMemberNotFoundException(MemberNotFoundException ex, WebRequest request) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorResponse> handleMemberNotFoundException(MemberNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), null);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     // Handle duplicate key exception like duplicate email
     @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<String> handleDuplicateKeyException(DuplicateKeyException ex) {
-        return new ResponseEntity<>("Email already exists", HttpStatus.CONFLICT);
+    public ResponseEntity<ErrorResponse> handleDuplicateKeyException(DuplicateKeyException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("Email already exists", Collections.singletonMap("email", "Email already exists"));
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -48,21 +47,15 @@ public class GlobalExceptionHandler {
 
     // Handle MongoDB related exceptions
     @ExceptionHandler(com.mongodb.MongoException.class)
-    public ResponseEntity<Object> handleMongoException(com.mongodb.MongoException ex, WebRequest request) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("message", "Database error: " + ex.getMessage());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ErrorResponse> handleMongoException(com.mongodb.MongoException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("Database error: " + ex.getMessage(), null);
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // Handle any other exceptions
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleGlobalException(Exception ex, WebRequest request) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("message", "An unexpected error occurred: " + ex.getMessage());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        ErrorResponse errorResponse = new ErrorResponse("An unexpected error occurred: " + ex.getMessage(), null);
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
