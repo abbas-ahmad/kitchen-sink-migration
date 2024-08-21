@@ -42,7 +42,8 @@ public class MemberController {
     @GetMapping
     public List<MemberDTO> getAllMembers() {
         return memberService.getAllMembers().stream()
-                .map(member -> new MemberDTO(member.getId(),
+                .map(member -> new MemberDTO(
+                        member.getId(),
                         member.getName(),
                         member.getEmail(),
                         member.getPhoneNumber()))
@@ -53,7 +54,10 @@ public class MemberController {
     public ResponseEntity<MemberDTO> getMemberById(@PathVariable Long id) {
         Member member = memberService.getMemberById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + id));
-        MemberDTO memberDTO = new MemberDTO(member.getId(), member.getName(), member.getEmail(), member.getPhoneNumber());
+        MemberDTO memberDTO = new MemberDTO(member.getId(),
+                                            member.getName(),
+                                            member.getEmail(),
+                                            member.getPhoneNumber());
         return new ResponseEntity<>(memberDTO, HttpStatus.OK);
     }
 
