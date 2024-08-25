@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import utils.JwtUtil;
 
 @SpringBootApplication
 public class KitchenSinkAppApplication {
@@ -22,6 +23,11 @@ public class KitchenSinkAppApplication {
                         .allowedOrigins("*");
             }
         };
+    }
+
+    @Bean
+    public JwtUtil jwtUtil() {
+        return new JwtUtil();
     }
 
 }
